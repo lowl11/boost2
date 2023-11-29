@@ -5,7 +5,8 @@ import "github.com/IBM/sarama"
 type Configurator struct {
 	config *sarama.Config
 
-	hosts []string
+	hosts     []string
+	groupName string
 }
 
 func New(hosts ...string) *Configurator {

@@ -32,6 +32,15 @@ func (configurator *Configurator) Hosts() []string {
 	return configurator.hosts
 }
 
+func (configurator *Configurator) Group() string {
+	return configurator.groupName
+}
+
+func (configurator *Configurator) SetGroup(groupName string) *Configurator {
+	configurator.groupName = groupName
+	return configurator
+}
+
 func (configurator *Configurator) SetMechanism(mechanism string) *Configurator {
 	configurator.config.Net.SASL.Mechanism = sarama.SASLMechanism(mechanism)
 	return configurator
