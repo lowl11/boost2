@@ -10,11 +10,14 @@ func (service *Service) Add(stoppers ...func()) *Service {
 	return service
 }
 
+func (service *Service) GetSignals() chan os.Signal {
+	return service.signals
+}
+
 func (service *Service) Catch() {
 	go func() {
-		signals := make(chan os.Signal, 1)
-		signal.Notify(signals, os.Interrupt)
-		<-signals
+		signal.Notify(service.signals, os.Interrupt)
+		<-service.signals
 
 		for _, stopper := range service.stoppers {
 			stopper()
