@@ -18,6 +18,10 @@ func Parse(result any) error {
 	return config.Get().Parse(result)
 }
 
+func Load(filesNames ...string) error {
+	return config.Get().Load(filesNames...)
+}
+
 func MustParse(result any) {
 	if err := config.Get().Parse(result); err != nil {
 		log.Fatal("Load config structure error: ", err)
