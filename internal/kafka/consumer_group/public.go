@@ -29,6 +29,12 @@ func (consumerGroup *ConsumerGroup) StartConsume(handlerFunc types.KafkaConsumer
 		return err
 	}
 
+	innerClient, err := sarama.NewClient(consumerGroup.config.Hosts(), consumerGroup.config.Config())
+	if err != nil {
+		return err
+	}
+
+	consumerGroup.innerClient = innerClient
 	consumerGroup.client = client
 
 	destroyer.Get().Add(func() {

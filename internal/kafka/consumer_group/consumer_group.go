@@ -12,6 +12,7 @@ type ConsumerGroup struct {
 	topicNames   []string
 	groupName    string
 	client       sarama.ConsumerGroup
+	innerClient  sarama.Client
 	stoppers     []chan bool
 	errorHandler types.ErrorHandler
 }
