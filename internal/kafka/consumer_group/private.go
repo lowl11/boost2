@@ -14,6 +14,12 @@ func (consumerGroup *ConsumerGroup) handleConsumers(handlerFunc types.KafkaConsu
 			return err
 		}
 
+		if consumerGroup.stoppers == nil {
+			consumerGroup.stoppers = make([]chan bool, 0, len(partitions))
+		}
+
+		consumerGroup.stoppers = append(consumerGroup.stoppers, make(chan bool, 1))
+
 		for i := 0; i < len(partitions); i++ {
 			go func(topic string) {
 				err = consumerGroup.client.Consume(
