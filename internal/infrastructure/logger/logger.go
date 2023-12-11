@@ -2,7 +2,6 @@ package logger
 
 import (
 	"github.com/lowl11/boost2/internal/infrastructure/stopper"
-	"github.com/lowl11/boost2/log"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -24,7 +23,7 @@ func Get() *Logger {
 	zapLogger, _ := config.Build()
 	stopper.Get().Add(func() {
 		if err := zapLogger.Sync(); err != nil {
-			log.Error("Sync logger error: ", err)
+			instance.Error("Sync logger error: ", err)
 		}
 	})
 
