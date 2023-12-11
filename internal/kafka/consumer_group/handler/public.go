@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"github.com/IBM/sarama"
 	"github.com/lowl11/boost2/data/types"
 	"github.com/lowl11/boost2/log"
@@ -44,7 +45,19 @@ func callHandlerFunc(handlerFunc types.KafkaConsumerHandler, message *sarama.Con
 			return
 		}
 
-		err = errors.New(errRecover.(string))
+		errStr, ok := errRecover.(string)
+		if ok {
+			err = errors.New(errStr)
+			return
+		}
+
+		errErr, ok := errRecover.(error)
+		if ok {
+			err = errErr
+			return
+		}
+
+		err = errors.New(fmt.Sprintf("%s", err))
 	}()
 
 	if err = handlerFunc(message); err != nil {
