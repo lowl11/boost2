@@ -1,6 +1,9 @@
 package logger
 
 import (
+	"github.com/lowl11/boost2/internal/infrastructure/logger/log_config"
+	"github.com/lowl11/boost2/internal/infrastructure/stopper"
+	"github.com/lowl11/boost2/log"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -16,14 +19,38 @@ func Get() *Logger {
 		return instance
 	}
 
-	atom := zap.NewAtomicLevelAt(zapcore.DebugLevel)
 	config := zap.NewProductionConfig()
-	config.Level = atom
+	addEncoder(&config)
+	addLevel(&config)
 	zapLogger, _ := config.Build()
-	// TODO: sync logger
+	stopper.Get().Add(func() {
+		if err := zapLogger.Sync(); err != nil {
+			log.Error("Sync logger error: ", err)
+		}
+	})
 
 	logger := &Logger{
 		sugar: zapLogger.Sugar(),
 	}
 	return logger
+}
+
+func addEncoder(config *zap.Config) {
+	if log_config.Config != nil {
+		return
+	}
+
+	config.Encoding = "console"
+	config.EncoderConfig = zapcore.EncoderConfig{
+		MessageKey:  "message",
+		LevelKey:    "level",
+		TimeKey:     "time",
+		EncodeLevel: zapcore.CapitalColorLevelEncoder,
+		EncodeTime:  zapcore.RFC3339TimeEncoder,
+	}
+}
+
+func addLevel(config *zap.Config) {
+	atom := zap.NewAtomicLevelAt(zapcore.DebugLevel)
+	config.Level = atom
 }
