@@ -29,7 +29,7 @@ func (handler *Handler) ConsumeClaim(session sarama.ConsumerGroupSession, claim 
 	case message := <-claim.Messages():
 		if stackTrace, err := callHandlerFunc(handler.handlerFunc, message, handler.errorHandler); err != nil {
 			log.Error(err, "Kafka handler func error")
-			if stackTrace != nil {
+			if strings.Contains(err.Error(), "nil pointer") && stackTrace != nil {
 				log.Error("\n", strings.Join(exception.GetStackTrace(), "\n"))
 			}
 		} else {
@@ -63,9 +63,7 @@ func callHandlerFunc(handlerFunc types.KafkaConsumerHandler, message *sarama.Con
 		}
 
 		err = errors.New(fmt.Sprintf("%s", err))
-		if strings.Contains(err.Error(), "nil pointer") {
-			stackTrace = exception.GetStackTrace()
-		}
+		stackTrace = exception.GetStackTrace()
 	}()
 
 	if err = handlerFunc(message); err != nil {
@@ -73,7 +71,7 @@ func callHandlerFunc(handlerFunc types.KafkaConsumerHandler, message *sarama.Con
 			errorHandler(err)
 		}
 
-		return nil, err
+		return exception.GetStackTrace(), err
 	}
 
 	return nil, nil
