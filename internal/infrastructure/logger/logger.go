@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"github.com/lowl11/boost2/internal/infrastructure/logger/log_config"
 	"github.com/lowl11/boost2/internal/infrastructure/stopper"
 	"github.com/lowl11/boost2/log"
 	"go.uber.org/zap"
@@ -36,10 +35,6 @@ func Get() *Logger {
 }
 
 func addEncoder(config *zap.Config) {
-	if log_config.Config != nil {
-		return
-	}
-
 	config.Encoding = "console"
 	config.EncoderConfig = zapcore.EncoderConfig{
 		MessageKey:  "message",
