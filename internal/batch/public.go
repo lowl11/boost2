@@ -2,21 +2,24 @@ package batch
 
 import "github.com/IBM/sarama"
 
-func (batch *Batch) Append(messages ...*sarama.ProducerMessage) bool {
+func (batch *Batch) Produce(messages ...*sarama.ProducerMessage) error {
 	batch.mx.Lock()
 	defer batch.mx.Unlock()
+
+	if batch.needProduce.Load() {
+		if err := ProducerFunc(batch.messages); err != nil {
+			return err
+		}
+
+		batch.
+			clearMessages().
+			refreshTicker()
+	}
 
 	batch.messages = append(batch.messages, messages...)
-	return len(batch.messages) == Size
-}
+	if len(batch.messages) >= Size {
+		batch.needProduce.Store(true)
+	}
 
-func (batch *Batch) Get() []*sarama.ProducerMessage {
-	batch.mx.Lock()
-	defer batch.mx.Unlock()
-
-	return batch.messages
-}
-
-func (batch *Batch) Clear() {
-	batch.messages = make([]*sarama.ProducerMessage, 0, Size)
+	return nil
 }

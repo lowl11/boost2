@@ -27,14 +27,12 @@ func (producer *Producer) Publish(topic, key string, objects ...any) error {
 	}
 
 	batch.Size = producer.batchSize
+	batch.ProducerFunc = func(messages []*sarama.ProducerMessage) error {
+		return producer.client.SendMessages(messages)
+	}
 
 	if producer.isBatch {
-		if batch.Get().Append(messages...) {
-			defer batch.Get().Clear()
-			return producer.client.SendMessages(batch.Get().Get())
-		}
-
-		return nil
+		return batch.Get().Produce(messages...)
 	}
 
 	return producer.client.SendMessages(messages)
