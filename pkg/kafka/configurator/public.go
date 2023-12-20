@@ -14,6 +14,20 @@ func (configurator *Configurator) Config() *sarama.Config {
 	return configurator.config
 }
 
+func (configurator *Configurator) IsBatch() bool {
+	return configurator.isBatch
+}
+
+func (configurator *Configurator) BatchSize() int {
+	return configurator.batchSize
+}
+
+func (configurator *Configurator) SetBatch(size int) *Configurator {
+	configurator.isBatch = true
+	configurator.batchSize = size
+	return configurator
+}
+
 func (configurator *Configurator) SetConsumer() *Configurator {
 	configurator.config.Consumer.Return.Errors = true
 	configurator.config.Consumer.MaxWaitTime = time.Minute * 2

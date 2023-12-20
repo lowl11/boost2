@@ -3,6 +3,7 @@ package sync_producer
 import (
 	"encoding/json"
 	"github.com/IBM/sarama"
+	"github.com/lowl11/boost2/internal/batch"
 )
 
 func (producer *Producer) Publish(topic, key string, objects ...any) error {
@@ -25,5 +26,14 @@ func (producer *Producer) Publish(topic, key string, objects ...any) error {
 		})
 	}
 
-	return producer.client.SendMessages(messages)
+	batch.Size = producer.batchSize
+
+	if producer.isBatch {
+		if batch.Get().Append(messages...) {
+			defer batch.Get().Clear()
+			return producer.client.SendMessages(batch.Get().Get())
+		}
+	}
+
+	return nil
 }

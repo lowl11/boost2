@@ -7,6 +7,8 @@ type Configurator struct {
 
 	hosts     []string
 	groupName string
+	isBatch   bool
+	batchSize int
 }
 
 func New(hosts ...string) *Configurator {

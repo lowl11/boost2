@@ -6,7 +6,9 @@ import (
 )
 
 type Producer struct {
-	client sarama.SyncProducer
+	client    sarama.SyncProducer
+	isBatch   bool
+	batchSize int
 }
 
 func New(config *configurator.Configurator) (*Producer, error) {
@@ -16,6 +18,8 @@ func New(config *configurator.Configurator) (*Producer, error) {
 	}
 
 	return &Producer{
-		client: client,
+		client:    client,
+		isBatch:   config.IsBatch(),
+		batchSize: config.BatchSize(),
 	}, nil
 }
