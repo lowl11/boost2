@@ -30,7 +30,7 @@ func (handler *Handler) ConsumeClaim(session sarama.ConsumerGroupSession, claim 
 		case message, ok := <-claim.Messages():
 			if !ok {
 				log.Error("Cannot claim message")
-				continue
+				return nil
 			}
 
 			if stackTrace, err := callHandlerFunc(handler.handlerFunc, message, handler.errorHandler); err != nil {
