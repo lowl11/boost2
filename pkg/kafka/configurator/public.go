@@ -20,6 +20,7 @@ func (configurator *Configurator) SetConsumer() *Configurator {
 
 func (configurator *Configurator) SetProducer() *Configurator {
 	configurator.config.Producer.Return.Successes = true
+	configurator.config.Producer.RequiredAcks = sarama.WaitForAll
 	return configurator
 }
 
