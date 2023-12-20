@@ -9,7 +9,7 @@ import (
 
 type ConsumerGroup struct {
 	config       *configurator.Configurator
-	topicNames   []string
+	topicName    string
 	groupName    string
 	client       sarama.ConsumerGroup
 	innerClient  sarama.Client
@@ -17,11 +17,11 @@ type ConsumerGroup struct {
 	errorHandler types.ErrorHandler
 }
 
-func New(config *configurator.Configurator, topicNames ...string) *ConsumerGroup {
+func New(topicName string, config *configurator.Configurator) *ConsumerGroup {
 	consumerGroup := &ConsumerGroup{
-		config:     config,
-		topicNames: topicNames,
-		groupName:  config.Group(),
+		config:    config,
+		topicName: topicName,
+		groupName: config.Group(),
 	}
 	stopper.Get().Add(consumerGroup.Stop)
 	return consumerGroup

@@ -8,30 +8,18 @@ import (
 )
 
 func (consumerGroup *ConsumerGroup) handleConsumers(handlerFunc types.KafkaConsumerHandler) error {
-	for _, topic := range consumerGroup.topicNames {
-		partitions, err := consumerGroup.innerClient.Partitions(topic)
-		if err != nil {
-			return err
-		}
+	if consumerGroup.stoppers == nil {
+		consumerGroup.stoppers = make([]chan bool, 0, 1)
+	}
 
-		if consumerGroup.stoppers == nil {
-			consumerGroup.stoppers = make([]chan bool, 0, len(partitions))
-		}
+	consumerGroup.stoppers = append(consumerGroup.stoppers, make(chan bool, 1))
 
-		consumerGroup.stoppers = append(consumerGroup.stoppers, make(chan bool, 1))
-
-		for i := 0; i < len(partitions); i++ {
-			go func(topic string) {
-				err = consumerGroup.client.Consume(
-					context.Background(),
-					consumerGroup.topicNames,
-					handler.New(handlerFunc, consumerGroup.errorHandler, consumerGroup.stoppers[0]),
-				)
-				if err != nil {
-					log.Fatal("Start consuming topic ", topic, " error: ", err)
-				}
-			}(topic)
-		}
+	if err := consumerGroup.client.Consume(
+		context.Background(),
+		[]string{consumerGroup.topicName},
+		handler.New(handlerFunc, consumerGroup.errorHandler, consumerGroup.stoppers[0]),
+	); err != nil {
+		log.Fatal("Start consuming topic ", consumerGroup.topicName, " error: ", err)
 	}
 
 	return nil

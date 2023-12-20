@@ -25,19 +25,27 @@ func (handler *Handler) Cleanup(session sarama.ConsumerGroupSession) error {
 // Once the Messages() channel is closed, the Handler must finish its processing
 // loop and exit.
 func (handler *Handler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
-	select {
-	case message := <-claim.Messages():
-		if stackTrace, err := callHandlerFunc(handler.handlerFunc, message, handler.errorHandler); err != nil {
-			log.Error(err, "Kafka handler func error")
-			if strings.Contains(err.Error(), "nil pointer") && stackTrace != nil {
-				log.Error("\n", strings.Join(exception.GetStackTrace(), "\n"))
+	for {
+		select {
+		case message, ok := <-claim.Messages():
+			if !ok {
+				log.Error("Cannot claim message")
+				continue
 			}
-		} else {
-			session.MarkMessage(message, "")
+
+			if stackTrace, err := callHandlerFunc(handler.handlerFunc, message, handler.errorHandler); err != nil {
+				log.Error("Kafka handler func error: ", err)
+				if strings.Contains(err.Error(), "nil pointer") && stackTrace != nil {
+					log.Error("\n", strings.Join(exception.GetStackTrace(), "\n"))
+				}
+			} else {
+				session.MarkMessage(message, "")
+				session.Commit()
+			}
+		case <-handler.stopper:
+			log.Info("Stopping consumer group")
+			return nil
 		}
-	case <-handler.stopper:
-		log.Info("Stopping consumer group")
-		return nil
 	}
 
 	return nil
