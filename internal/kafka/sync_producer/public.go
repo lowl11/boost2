@@ -33,7 +33,9 @@ func (producer *Producer) Publish(topic, key string, objects ...any) error {
 			defer batch.Get().Clear()
 			return producer.client.SendMessages(batch.Get().Get())
 		}
+
+		return nil
 	}
 
-	return nil
+	return producer.client.SendMessages(messages)
 }
