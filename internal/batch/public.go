@@ -18,7 +18,7 @@ func (batch *Batch) Produce(messages ...*sarama.ProducerMessage) error {
 
 	batch.messages = append(batch.messages, messages...)
 	if len(batch.messages) >= Size {
-		batch.needProduce.Store(true)
+		return ProducerFunc(batch.messages)
 	}
 
 	return nil
