@@ -3,6 +3,7 @@ package configurator
 import (
 	"github.com/IBM/sarama"
 	"github.com/lowl11/boost2/data/enums/mechanisms"
+	"time"
 )
 
 func (configurator *Configurator) Config() *sarama.Config {
@@ -22,6 +23,7 @@ func (configurator *Configurator) SetProducer() *Configurator {
 	configurator.config.Producer.Return.Successes = true
 	configurator.config.Producer.RequiredAcks = sarama.WaitForAll
 	configurator.config.Producer.Retry.Max = 5
+	configurator.config.Producer.Timeout = time.Second * 60
 	return configurator
 }
 
