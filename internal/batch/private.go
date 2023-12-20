@@ -18,10 +18,12 @@ func (batch *Batch) refreshTicker() *Batch {
 }
 
 func (batch *Batch) waitTicker() {
-	<-batch.ticker.C
-	batch.needProduce.Store(true)
+	for {
+		<-batch.ticker.C
+		batch.needProduce.Store(true)
 
-	if err := batch.Produce(); err != nil {
-		log.Error("Produce batch messages after expiring time error: ", err)
+		if err := batch.Produce(); err != nil {
+			log.Error("Produce batch messages after expiring time error: ", err)
+		}
 	}
 }
