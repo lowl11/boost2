@@ -29,18 +29,18 @@ func (consumer *Consumer) handleConsumerFunc(wg *sync.WaitGroup, partitionNum in
 	if err != nil {
 		log.Error("Consuming partition error: ", err)
 	}
-	defer func() {
-		if err = partConsumer.Close(); err != nil {
-			log.Error("Close partition consumer error: ", err)
-		}
-	}()
 
 	for {
 		select {
 		case message := <-partConsumer.Messages():
 			callHandlerFunc(handlerFunc, message, consumer.errorHandler)
+		case kafkaError := <-partConsumer.Errors():
+			log.Error("Kafka consumer error: ", kafkaError.Error(), ". Partition: ", kafkaError.Partition)
 		case <-consumer.stoppers[partitionNum]:
 			log.Info("Stopping consumer with partition #", partitionNum+1)
+			if err = partConsumer.Close(); err != nil {
+				log.Error("Close partition consumer error: ", err)
+			}
 			return
 		}
 	}

@@ -10,7 +10,7 @@ func (producer *Producer) Publish(topic, key string, objects ...any) error {
 		return nil
 	}
 
-	messages := make([]*sarama.ProducerMessage, 0)
+	messages := make([]*sarama.ProducerMessage, 0, len(objects))
 
 	for _, obj := range objects {
 		objectInBytes, err := json.Marshal(obj)
