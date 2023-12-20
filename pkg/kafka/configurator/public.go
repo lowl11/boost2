@@ -34,6 +34,7 @@ func (configurator *Configurator) SetConsumer() *Configurator {
 	configurator.config.Consumer.MaxProcessingTime = time.Minute * 2
 	configurator.config.Consumer.Offsets.Retry.Max = 3
 	configurator.config.Consumer.Offsets.AutoCommit.Enable = false
+	configurator.config.Consumer.Offsets.Initial = sarama.OffsetNewest
 	return configurator
 }
 

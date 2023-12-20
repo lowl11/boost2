@@ -47,8 +47,6 @@ func (handler *Handler) ConsumeClaim(session sarama.ConsumerGroupSession, claim 
 			return nil
 		}
 	}
-
-	return nil
 }
 
 func callHandlerFunc(handlerFunc types.KafkaConsumerHandler, message *sarama.ConsumerMessage, errorHandler types.ErrorHandler) (stackTrace []string, err error) {
