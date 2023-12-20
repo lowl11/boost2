@@ -16,6 +16,10 @@ func (configurator *Configurator) Config() *sarama.Config {
 
 func (configurator *Configurator) SetConsumer() *Configurator {
 	configurator.config.Consumer.Return.Errors = true
+	configurator.config.Consumer.MaxWaitTime = time.Minute * 2
+	configurator.config.Consumer.MaxProcessingTime = time.Minute * 2
+	configurator.config.Consumer.Offsets.Retry.Max = 3
+	configurator.config.Consumer.Offsets.AutoCommit.Enable = false
 	return configurator
 }
 
