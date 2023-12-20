@@ -18,6 +18,7 @@ func (batch *Batch) Produce(messages ...*sarama.ProducerMessage) error {
 
 	batch.messages = append(batch.messages, messages...)
 	if len(batch.messages) >= Size {
+		defer batch.refreshTicker()
 		return ProducerFunc(batch.messages)
 	}
 
