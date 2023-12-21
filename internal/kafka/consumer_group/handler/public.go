@@ -44,6 +44,8 @@ func (handler *Handler) ConsumeClaim(session sarama.ConsumerGroupSession, claim 
 
 			session.MarkMessage(message, "")
 			session.Commit()
+		case <-session.Context().Done():
+			return nil
 		case <-handler.stopper:
 			log.Info("Stopping consumer group")
 			return nil

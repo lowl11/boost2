@@ -7,29 +7,20 @@ import (
 	"github.com/lowl11/boost2/log"
 )
 
-func (consumerGroup *ConsumerGroup) handleConsumers(handlerFunc types.KafkaConsumerHandler) error {
+func (consumerGroup *ConsumerGroup) handleConsumers(ctx context.Context, handlerFunc types.KafkaConsumerHandler) error {
 	h := handler.New(handlerFunc, consumerGroup.errorHandler, consumerGroup.stopper)
 
 	for {
-		if err := startConsume(consumerGroup, h); err != nil {
+		select {
+		case err := <-consumerGroup.client.Errors():
+			log.Error("Consumer group catch error: ", err)
 			return err
+		case <-ctx.Done():
+			return nil
+		default:
+			if err := consumerGroup.client.Consume(ctx, []string{consumerGroup.topicName}, h); err != nil {
+				return err
+			}
 		}
 	}
-}
-
-func startConsume(group *ConsumerGroup, h *handler.Handler) error {
-	ctx, cancel := context.WithTimeout(context.Background(), group.connectionTimeout)
-	defer cancel()
-
-	select {
-	case err := <-group.client.Errors():
-		log.Error("Consumer group catch error: ", err)
-		return err
-	default:
-		if err := group.client.Consume(ctx, []string{group.topicName}, h); err != nil {
-			return err
-		}
-	}
-
-	return nil
 }

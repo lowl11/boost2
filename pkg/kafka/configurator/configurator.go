@@ -2,7 +2,6 @@ package configurator
 
 import (
 	"github.com/IBM/sarama"
-	"time"
 )
 
 type Configurator struct {
@@ -12,15 +11,11 @@ type Configurator struct {
 	groupName string
 	isBatch   bool
 	batchSize int
-
-	connectionTimeout *time.Duration
 }
 
 func New(hosts ...string) *Configurator {
-	service := &Configurator{
+	return &Configurator{
 		config: sarama.NewConfig(),
 		hosts:  hosts,
 	}
-	service.loadBasic()
-	return service
 }

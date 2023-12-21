@@ -1,6 +1,7 @@
 package consumer
 
 import (
+	"context"
 	"github.com/IBM/sarama"
 	"github.com/lowl11/boost2/data/interfaces"
 	"github.com/lowl11/boost2/data/types"
@@ -19,7 +20,7 @@ func (consumer *Consumer) SetErrorHandler(errorHandler types.ErrorHandler) inter
 	return consumer
 }
 
-func (consumer *Consumer) StartConsume(handlerFunc types.KafkaConsumerHandler) error {
+func (consumer *Consumer) StartConsume(ctx context.Context, handlerFunc types.KafkaConsumerHandler) error {
 	client, err := sarama.NewConsumer(consumer.config.Hosts(), consumer.config.Config())
 	if err != nil {
 		return err
@@ -45,9 +46,9 @@ func (consumer *Consumer) StartConsume(handlerFunc types.KafkaConsumerHandler) e
 	return nil
 }
 
-func (consumer *Consumer) StartConsumeAsync(handlerFunc types.KafkaConsumerHandler) {
+func (consumer *Consumer) StartConsumeAsync(ctx context.Context, handlerFunc types.KafkaConsumerHandler) {
 	go func() {
-		if err := consumer.StartConsume(handlerFunc); err != nil {
+		if err := consumer.StartConsume(ctx, handlerFunc); err != nil {
 			log.Error("Start Kafka consumer error: ", err)
 		}
 	}()

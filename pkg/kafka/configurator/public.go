@@ -30,26 +30,10 @@ func (configurator *Configurator) SetBatch(size int) *Configurator {
 
 func (configurator *Configurator) SetConsumer(offset int64) *Configurator {
 	configurator.config.Consumer.Return.Errors = true
-	configurator.config.Consumer.MaxWaitTime = time.Minute * 2
-	configurator.config.Consumer.MaxProcessingTime = time.Minute * 2
-	configurator.config.Consumer.Offsets.Retry.Max = 3
-	configurator.config.Consumer.Offsets.AutoCommit.Enable = false
 	configurator.config.Consumer.Offsets.Initial = offset
+	configurator.config.Consumer.Offsets.AutoCommit.Enable = false
+	configurator.config.Consumer.Offsets.AutoCommit.Enable = false
 	return configurator
-}
-
-func (configurator *Configurator) SetConnectionTimeout(timeout time.Duration) *Configurator {
-	configurator.connectionTimeout = &timeout
-	return configurator
-}
-
-func (configurator *Configurator) GetConnectionTimeout() time.Duration {
-	if configurator.connectionTimeout == nil {
-		defaultTimeout := time.Second * 5
-		configurator.connectionTimeout = &defaultTimeout
-	}
-
-	return *configurator.connectionTimeout
 }
 
 func (configurator *Configurator) SetProducer() *Configurator {
@@ -84,6 +68,7 @@ func (configurator *Configurator) SetMechanism(mechanism string) *Configurator {
 }
 
 func (configurator *Configurator) SetAuth(username, password string) *Configurator {
+	configurator.config.Net.SASL.Enable = true
 	configurator.config.Net.SASL.User = username
 	configurator.config.Net.SASL.Password = password
 	return configurator
