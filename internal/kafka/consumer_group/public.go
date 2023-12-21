@@ -49,7 +49,7 @@ func (consumerGroup *ConsumerGroup) StartConsume(handlerFunc types.KafkaConsumer
 func (consumerGroup *ConsumerGroup) StartConsumeAsync(handlerFunc types.KafkaConsumerHandler) {
 	go func() {
 		if err := consumerGroup.StartConsume(handlerFunc); err != nil {
-			log.Error(err, "Start consume error")
+			log.Fatal(err, "Start consume error")
 		}
 	}()
 }

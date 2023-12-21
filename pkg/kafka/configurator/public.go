@@ -28,13 +28,13 @@ func (configurator *Configurator) SetBatch(size int) *Configurator {
 	return configurator
 }
 
-func (configurator *Configurator) SetConsumer() *Configurator {
+func (configurator *Configurator) SetConsumer(offset int64) *Configurator {
 	configurator.config.Consumer.Return.Errors = true
 	configurator.config.Consumer.MaxWaitTime = time.Minute * 2
 	configurator.config.Consumer.MaxProcessingTime = time.Minute * 2
 	configurator.config.Consumer.Offsets.Retry.Max = 3
 	configurator.config.Consumer.Offsets.AutoCommit.Enable = false
-	configurator.config.Consumer.Offsets.Initial = sarama.OffsetNewest
+	configurator.config.Consumer.Offsets.Initial = offset
 	return configurator
 }
 
