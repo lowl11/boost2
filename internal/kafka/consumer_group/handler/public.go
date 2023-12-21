@@ -39,6 +39,10 @@ func (handler *Handler) ConsumeClaim(session sarama.ConsumerGroupSession, claim 
 					log.Error("\n", strings.Join(exception.GetStackTrace(), "\n"))
 				}
 
+				if !strings.Contains(err.Error(), "deadline exceeded") {
+					return nil
+				}
+
 				return err
 			}
 
