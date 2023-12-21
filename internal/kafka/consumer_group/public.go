@@ -9,9 +9,7 @@ import (
 )
 
 func (consumerGroup *ConsumerGroup) Stop() {
-	for _, stopper := range consumerGroup.stoppers {
-		stopper <- true
-	}
+	consumerGroup.stopper <- true
 }
 
 func (consumerGroup *ConsumerGroup) SetErrorHandler(errorHandler types.ErrorHandler) interfaces.IConsumer {

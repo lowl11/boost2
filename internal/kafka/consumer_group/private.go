@@ -8,12 +8,7 @@ import (
 )
 
 func (consumerGroup *ConsumerGroup) handleConsumers(handlerFunc types.KafkaConsumerHandler) error {
-	if consumerGroup.stoppers == nil {
-		consumerGroup.stoppers = make([]chan bool, 0, 1)
-	}
-
-	consumerGroup.stoppers = append(consumerGroup.stoppers, make(chan bool, 1))
-	h := handler.New(handlerFunc, consumerGroup.errorHandler, consumerGroup.stoppers[0])
+	h := handler.New(handlerFunc, consumerGroup.errorHandler, consumerGroup.stopper)
 
 	for {
 		if err := startConsume(consumerGroup, h); err != nil {
@@ -29,7 +24,7 @@ func startConsume(group *ConsumerGroup, h *handler.Handler) error {
 	select {
 	case err := <-group.client.Errors():
 		log.Error("Consumer group catch error: ", err)
-		return nil
+		return err
 	default:
 		if err := group.client.Consume(ctx, []string{group.topicName}, h); err != nil {
 			return err

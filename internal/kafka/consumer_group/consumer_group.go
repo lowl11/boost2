@@ -13,7 +13,7 @@ type ConsumerGroup struct {
 	topicName         string
 	groupName         string
 	client            sarama.ConsumerGroup
-	stoppers          []chan bool
+	stopper           chan bool
 	errorHandler      types.ErrorHandler
 	connectionTimeout time.Duration
 }
@@ -24,6 +24,7 @@ func New(topicName string, config *configurator.Configurator) *ConsumerGroup {
 		topicName:         topicName,
 		groupName:         config.Group(),
 		connectionTimeout: config.GetConnectionTimeout(),
+		stopper:           make(chan bool),
 	}
 	stopper.Get().Add(consumerGroup.Stop)
 	return consumerGroup

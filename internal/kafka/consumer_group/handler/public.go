@@ -38,10 +38,12 @@ func (handler *Handler) ConsumeClaim(session sarama.ConsumerGroupSession, claim 
 				if strings.Contains(err.Error(), "nil pointer") && stackTrace != nil {
 					log.Error("\n", strings.Join(exception.GetStackTrace(), "\n"))
 				}
-			} else {
-				session.MarkMessage(message, "")
-				session.Commit()
+
+				return err
 			}
+
+			session.MarkMessage(message, "")
+			session.Commit()
 		case <-handler.stopper:
 			log.Info("Stopping consumer group")
 			return nil
