@@ -11,6 +11,6 @@ func New(topicName string, config *configurator.Configurator) boost2.IConsumer {
 	return consumer.New(topicName, config)
 }
 
-func NewGroup(topicName string, config *configurator.Configurator) boost2.IConsumer {
-	return consumer_group.New(topicName, config)
+func NewGroup(topicName, groupName string, config *configurator.Configurator) boost2.IConsumer {
+	return consumer_group.New(topicName, groupName, config)
 }

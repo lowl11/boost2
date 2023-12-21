@@ -16,11 +16,11 @@ type ConsumerGroup struct {
 	errorHandler types.ErrorHandler
 }
 
-func New(topicName string, config *configurator.Configurator) *ConsumerGroup {
+func New(topicName, groupName string, config *configurator.Configurator) *ConsumerGroup {
 	consumerGroup := &ConsumerGroup{
 		config:    config,
 		topicName: topicName,
-		groupName: config.Group(),
+		groupName: groupName,
 		stopper:   make(chan bool),
 	}
 	stopper.Get().Add(consumerGroup.Stop)

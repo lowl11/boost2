@@ -8,7 +8,6 @@ type Configurator struct {
 	config *sarama.Config
 
 	hosts     []string
-	groupName string
 	isBatch   bool
 	batchSize int
 }
