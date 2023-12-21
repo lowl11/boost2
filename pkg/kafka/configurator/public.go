@@ -37,6 +37,11 @@ func (configurator *Configurator) SetConsumer(offset int64) *Configurator {
 }
 
 func (configurator *Configurator) SetMaxProcessTime(timeout time.Duration) *Configurator {
+	configurator.config.Consumer.MaxProcessingTime = timeout
+	return configurator
+}
+
+func (configurator *Configurator) SetMaxWaitTime(timeout time.Duration) *Configurator {
 	configurator.config.Consumer.MaxWaitTime = timeout
 	return configurator
 }
