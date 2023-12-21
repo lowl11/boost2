@@ -13,15 +13,16 @@ func (consumerGroup *ConsumerGroup) handleConsumers(handlerFunc types.KafkaConsu
 	}
 
 	consumerGroup.stoppers = append(consumerGroup.stoppers, make(chan bool, 1))
+	h := handler.New(handlerFunc, consumerGroup.errorHandler, consumerGroup.stoppers[0])
 
 	for {
-		if err := startConsume(consumerGroup, handlerFunc); err != nil {
+		if err := startConsume(consumerGroup, h); err != nil {
 			return err
 		}
 	}
 }
 
-func startConsume(group *ConsumerGroup, handlerFunc types.KafkaConsumerHandler) error {
+func startConsume(group *ConsumerGroup, h *handler.Handler) error {
 	ctx, cancel := context.WithTimeout(context.Background(), group.connectionTimeout)
 	defer cancel()
 
@@ -30,11 +31,7 @@ func startConsume(group *ConsumerGroup, handlerFunc types.KafkaConsumerHandler) 
 		log.Error("Consumer group catch error: ", err)
 		return nil
 	default:
-		if err := group.client.Consume(
-			ctx,
-			[]string{group.topicName},
-			handler.New(handlerFunc, group.errorHandler, group.stoppers[0]),
-		); err != nil {
+		if err := group.client.Consume(ctx, []string{group.topicName}, h); err != nil {
 			return err
 		}
 	}

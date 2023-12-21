@@ -13,7 +13,6 @@ type ConsumerGroup struct {
 	topicName         string
 	groupName         string
 	client            sarama.ConsumerGroup
-	innerClient       sarama.Client
 	stoppers          []chan bool
 	errorHandler      types.ErrorHandler
 	connectionTimeout time.Duration
