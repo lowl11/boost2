@@ -1,6 +1,9 @@
 package configurator
 
-import "github.com/IBM/sarama"
+import (
+	"github.com/IBM/sarama"
+	"time"
+)
 
 type Configurator struct {
 	config *sarama.Config
@@ -9,6 +12,8 @@ type Configurator struct {
 	groupName string
 	isBatch   bool
 	batchSize int
+
+	connectionTimeout *time.Duration
 }
 
 func New(hosts ...string) *Configurator {

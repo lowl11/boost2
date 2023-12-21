@@ -38,6 +38,20 @@ func (configurator *Configurator) SetConsumer(offset int64) *Configurator {
 	return configurator
 }
 
+func (configurator *Configurator) SetConnectionTimeout(timeout time.Duration) *Configurator {
+	configurator.connectionTimeout = &timeout
+	return configurator
+}
+
+func (configurator *Configurator) GetConnectionTimeout() time.Duration {
+	if configurator.connectionTimeout == nil {
+		defaultTimeout := time.Second * 5
+		configurator.connectionTimeout = &defaultTimeout
+	}
+
+	return *configurator.connectionTimeout
+}
+
 func (configurator *Configurator) SetProducer() *Configurator {
 	configurator.config.Producer.Return.Successes = true
 	configurator.config.Producer.RequiredAcks = sarama.WaitForAll
