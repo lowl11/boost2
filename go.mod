@@ -3,7 +3,7 @@ module github.com/lowl11/boost2
 go 1.21
 
 require (
-	github.com/IBM/sarama v1.42.1
+	github.com/IBM/sarama v1.41.1
 	github.com/google/uuid v1.4.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
