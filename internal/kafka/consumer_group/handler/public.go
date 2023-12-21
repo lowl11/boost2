@@ -39,7 +39,7 @@ func (handler *Handler) ConsumeClaim(session sarama.ConsumerGroupSession, claim 
 					log.Error("\n", strings.Join(exception.GetStackTrace(), "\n"))
 				}
 
-				return nil
+				return err
 			}
 
 			session.MarkMessage(message, "")
