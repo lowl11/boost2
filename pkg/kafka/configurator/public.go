@@ -36,6 +36,11 @@ func (configurator *Configurator) SetConsumer(offset int64) *Configurator {
 	return configurator
 }
 
+func (configurator *Configurator) SetMaxProcessTime(timeout time.Duration) *Configurator {
+	configurator.config.Consumer.MaxWaitTime = timeout
+	return configurator
+}
+
 func (configurator *Configurator) SetProducer() *Configurator {
 	configurator.config.Producer.Return.Successes = true
 	configurator.config.Producer.RequiredAcks = sarama.WaitForAll

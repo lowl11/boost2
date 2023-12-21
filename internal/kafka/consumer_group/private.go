@@ -10,17 +10,17 @@ import (
 func (consumerGroup *ConsumerGroup) handleConsumers(ctx context.Context, handlerFunc types.KafkaConsumerHandler) error {
 	h := handler.New(handlerFunc, consumerGroup.errorHandler, consumerGroup.stopper)
 
-	for {
-		select {
-		case err := <-consumerGroup.client.Errors():
-			log.Error("Consumer group catch error: ", err)
-			return err
-		case <-ctx.Done():
-			return nil
-		default:
-			if err := consumerGroup.client.Consume(ctx, []string{consumerGroup.topicName}, h); err != nil {
-				return err
-			}
+	go func() {
+		if err := consumerGroup.client.Consume(ctx, []string{consumerGroup.topicName}, h); err != nil {
+			log.Fatal("Start consuming error: ", err)
 		}
+	}()
+
+	select {
+	case err := <-consumerGroup.client.Errors():
+		log.Error("Consumer group catch error: ", err)
+		return err
+	case <-ctx.Done():
+		return nil
 	}
 }
