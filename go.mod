@@ -5,9 +5,11 @@ go 1.21
 require (
 	github.com/IBM/sarama v1.41.1
 	github.com/google/uuid v1.4.0
+	github.com/jmoiron/sqlx v1.3.5
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/lowl11/boostef v0.1.15
+	github.com/lowl11/boostef v0.1.16
+	github.com/lowl11/flex v0.1.4
 	go.uber.org/zap v1.26.0
 )
 
@@ -30,11 +32,9 @@ require (
 	github.com/jcmturner/gofork v1.7.6 // indirect
 	github.com/jcmturner/gokrb5/v8 v8.4.4 // indirect
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
-	github.com/jmoiron/sqlx v1.3.5 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/lib/pq v1.2.0 // indirect
 	github.com/lowl11/boost v0.1.24 // indirect
-	github.com/lowl11/flex v0.1.4 // indirect
 	github.com/microsoft/go-mssqldb v1.6.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.18 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect

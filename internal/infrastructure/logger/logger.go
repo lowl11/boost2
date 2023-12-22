@@ -1,13 +1,16 @@
 package logger
 
 import (
+	"github.com/lowl11/boost2/internal/infrastructure/logger/storage_logger"
 	"github.com/lowl11/boost2/internal/infrastructure/stopper"
+	"github.com/lowl11/boostef/ef"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
 type Logger struct {
-	sugar *zap.SugaredLogger
+	sugar         *zap.SugaredLogger
+	storageLogger *storage_logger.Logger
 }
 
 var instance *Logger
@@ -28,7 +31,8 @@ func Get() *Logger {
 	})
 
 	logger := &Logger{
-		sugar: zapLogger.Sugar(),
+		sugar:         zapLogger.Sugar(),
+		storageLogger: storage_logger.New(ef.TryGet()),
 	}
 	return logger
 }
