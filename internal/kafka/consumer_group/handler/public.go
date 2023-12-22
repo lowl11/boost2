@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"github.com/IBM/sarama"
 	"github.com/lowl11/boost2/data/types"
-	"github.com/lowl11/boost2/internal/infrastructure/exception"
 	"github.com/lowl11/boost2/log"
-	"strings"
 )
 
 // Setup is run at the beginning of a new session, before ConsumeClaim.
@@ -33,15 +31,12 @@ func (handler *Handler) ConsumeClaim(session sarama.ConsumerGroupSession, claim 
 				return nil
 			}
 
-			if stackTrace, err := callHandlerFunc(handler.handlerFunc, message, handler.errorHandler); err != nil {
-				log.Error("Kafka handler func error: ", err)
-				if strings.Contains(err.Error(), "nil pointer") && stackTrace != nil {
-					log.Error("\n", strings.Join(exception.GetStackTrace(), "\n"))
-				}
+			if err := callHandlerFunc(handler.handlerFunc, message, handler.errorHandler); err != nil {
+				//log.Error("Kafka handler func error: ", err)
 
-				if !strings.Contains(err.Error(), "deadline exceeded") {
-					return nil
-				}
+				//if !strings.Contains(err.Error(), "deadline exceeded") {
+				//	return nil
+				//}
 
 				return err
 			}
@@ -57,7 +52,7 @@ func (handler *Handler) ConsumeClaim(session sarama.ConsumerGroupSession, claim 
 	}
 }
 
-func callHandlerFunc(handlerFunc types.KafkaConsumerHandler, message *sarama.ConsumerMessage, errorHandler types.ErrorHandler) (stackTrace []string, err error) {
+func callHandlerFunc(handlerFunc types.KafkaConsumerHandler, message *sarama.ConsumerMessage, errorHandler types.ErrorHandler) (err error) {
 	defer func() {
 		errRecover := recover()
 		if errRecover == nil {
@@ -77,7 +72,6 @@ func callHandlerFunc(handlerFunc types.KafkaConsumerHandler, message *sarama.Con
 		}
 
 		err = errors.New(fmt.Sprintf("%s", err))
-		stackTrace = exception.GetStackTrace()
 	}()
 
 	if err = handlerFunc(message); err != nil {
@@ -85,8 +79,8 @@ func callHandlerFunc(handlerFunc types.KafkaConsumerHandler, message *sarama.Con
 			errorHandler(err)
 		}
 
-		return exception.GetStackTrace(), err
+		return err
 	}
 
-	return nil, nil
+	return nil
 }
