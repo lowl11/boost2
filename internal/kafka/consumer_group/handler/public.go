@@ -9,13 +9,13 @@ import (
 )
 
 // Setup is run at the beginning of a new session, before ConsumeClaim.
-func (handler *Handler) Setup(session sarama.ConsumerGroupSession) error {
+func (handler *Handler) Setup(_ sarama.ConsumerGroupSession) error {
 	return nil
 }
 
 // Cleanup is run at the end of a session, once all ConsumeClaim goroutines have exited
 // but before the offsets are committed for the very last time.
-func (handler *Handler) Cleanup(session sarama.ConsumerGroupSession) error {
+func (handler *Handler) Cleanup(_ sarama.ConsumerGroupSession) error {
 	return nil
 }
 
@@ -32,17 +32,11 @@ func (handler *Handler) ConsumeClaim(session sarama.ConsumerGroupSession, claim 
 			}
 
 			if err := callHandlerFunc(handler.handlerFunc, message, handler.errorHandler); err != nil {
-				//log.Error("Kafka handler func error: ", err)
-
-				//if !strings.Contains(err.Error(), "deadline exceeded") {
-				//	return nil
-				//}
-
-				return err
+				log.Error("Kafka handler func error: ", err)
+			} else {
+				session.MarkMessage(message, "")
+				session.Commit()
 			}
-
-			session.MarkMessage(message, "")
-			session.Commit()
 		case <-session.Context().Done():
 			return nil
 		case <-handler.stopper:

@@ -20,8 +20,7 @@ func (consumerGroup *ConsumerGroup) handleConsumers(ctx context.Context, handler
 		select {
 		case err := <-consumerGroup.client.Errors():
 			if err != nil {
-				log.Error("Consumer group catch error: ", err)
-				//return err
+				return err
 			}
 		case <-ctx.Done():
 			return nil
