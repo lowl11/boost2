@@ -9,6 +9,9 @@ import (
 
 func (consumerGroup *ConsumerGroup) handleConsumers(ctx context.Context, handlerFunc types.KafkaConsumerHandler) error {
 	h := handler.New(handlerFunc, consumerGroup.errorHandler, consumerGroup.stopper)
+	if consumerGroup.alwaysCommit {
+		h.SetAlwaysCommit()
+	}
 
 	go func() {
 		if err := consumerGroup.client.Consume(ctx, []string{consumerGroup.topicName}, h); err != nil {

@@ -6,6 +6,7 @@ type Handler struct {
 	handlerFunc  types.KafkaConsumerHandler
 	stopper      chan bool
 	errorHandler types.ErrorHandler
+	alwaysCommit bool
 }
 
 func New(handlerFunc types.KafkaConsumerHandler, errorHandler types.ErrorHandler, stopper chan bool) *Handler {

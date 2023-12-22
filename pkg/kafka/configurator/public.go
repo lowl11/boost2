@@ -14,6 +14,15 @@ func (configurator *Configurator) Config() *sarama.Config {
 	return configurator.config
 }
 
+func (configurator *Configurator) SetAlwaysCommit() *Configurator {
+	configurator.alwaysCommit = true
+	return configurator
+}
+
+func (configurator *Configurator) IsAlwaysCommit() bool {
+	return configurator.alwaysCommit
+}
+
 func (configurator *Configurator) IsBatch() bool {
 	return configurator.isBatch
 }

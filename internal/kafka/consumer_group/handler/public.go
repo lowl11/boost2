@@ -8,6 +8,10 @@ import (
 	"github.com/lowl11/boost2/log"
 )
 
+func (handler *Handler) SetAlwaysCommit() {
+	handler.alwaysCommit = true
+}
+
 // Setup is run at the beginning of a new session, before ConsumeClaim.
 func (handler *Handler) Setup(_ sarama.ConsumerGroupSession) error {
 	return nil
@@ -34,6 +38,11 @@ func (handler *Handler) ConsumeClaim(session sarama.ConsumerGroupSession, claim 
 			if err := callHandlerFunc(handler.handlerFunc, message, handler.errorHandler); err != nil {
 				log.Error("Kafka handler func error: ", err)
 			} else {
+				session.MarkMessage(message, "")
+				session.Commit()
+			}
+
+			if handler.alwaysCommit {
 				session.MarkMessage(message, "")
 				session.Commit()
 			}
