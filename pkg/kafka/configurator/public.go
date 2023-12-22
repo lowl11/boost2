@@ -32,7 +32,11 @@ func (configurator *Configurator) SetConsumer(offset int64) *Configurator {
 	configurator.config.Consumer.Return.Errors = true
 	configurator.config.Consumer.Offsets.Initial = offset
 	configurator.config.Consumer.Offsets.AutoCommit.Enable = false
-	configurator.config.Consumer.Offsets.AutoCommit.Enable = false
+	return configurator
+}
+
+func (configurator *Configurator) SetBufferSize(size int) *Configurator {
+	configurator.config.ChannelBufferSize = size
 	return configurator
 }
 
@@ -51,6 +55,16 @@ func (configurator *Configurator) SetProducer() *Configurator {
 	configurator.config.Producer.RequiredAcks = sarama.WaitForAll
 	configurator.config.Producer.Retry.Max = 5
 	configurator.config.Producer.Timeout = time.Second * 60
+	return configurator
+}
+
+func (configurator *Configurator) SetProducerBatchSize(size int) *Configurator {
+	configurator.config.Producer.Flush.Bytes = size
+	return configurator
+}
+
+func (configurator *Configurator) SetFetchSize(size int) *Configurator {
+	configurator.config.Consumer.Fetch.Default = int32(size)
 	return configurator
 }
 
