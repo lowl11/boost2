@@ -44,6 +44,11 @@ func (configurator *Configurator) SetConsumer(offset int64) *Configurator {
 	return configurator
 }
 
+func (configurator *Configurator) SetAutocommit() *Configurator {
+	configurator.config.Consumer.Offsets.AutoCommit.Enable = true
+	return configurator
+}
+
 func (configurator *Configurator) SetBufferSize(size int) *Configurator {
 	configurator.config.ChannelBufferSize = size
 	return configurator

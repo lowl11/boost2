@@ -14,6 +14,10 @@ import (
 )
 
 func (logger Logger) write(env, service, level, message string) error {
+	if logger.connection == nil {
+		return nil
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
