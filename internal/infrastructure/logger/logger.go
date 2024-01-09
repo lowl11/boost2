@@ -22,9 +22,7 @@ func Get() *Logger {
 	addLevel(&config)
 	zapLogger, _ := config.Build()
 	stopper.Get().Add(func() {
-		if err := zapLogger.Sync(); err != nil {
-			instance.Error("Sync logger error: ", err)
-		}
+		_ = zapLogger.Sync()
 	})
 
 	instance = &Logger{

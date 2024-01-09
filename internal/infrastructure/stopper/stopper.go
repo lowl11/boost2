@@ -1,6 +1,9 @@
 package stopper
 
-import "os"
+import (
+	"os"
+	"os/signal"
+)
 
 type Service struct {
 	stoppers []func()
@@ -14,9 +17,11 @@ func Get() *Service {
 		return instance
 	}
 
+	signals := make(chan os.Signal)
+	signal.Notify(signals, os.Interrupt, os.Kill)
 	instance = &Service{
 		stoppers: make([]func(), 0),
-		signals:  make(chan os.Signal, 1),
+		signals:  signals,
 	}
 	return instance
 }
