@@ -7,7 +7,8 @@ import (
 )
 
 type Logger struct {
-	sugar *zap.SugaredLogger
+	sugar      *zap.SugaredLogger
+	logChannel chan func()
 }
 
 var instance *Logger
@@ -26,8 +27,10 @@ func Get() *Logger {
 	})
 
 	instance = &Logger{
-		sugar: zapLogger.Sugar(),
+		sugar:      zapLogger.Sugar(),
+		logChannel: make(chan func()),
 	}
+	instance.listen()
 	return instance
 }
 
