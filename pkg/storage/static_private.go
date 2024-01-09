@@ -2,8 +2,11 @@ package storage
 
 import (
 	"fmt"
-	"github.com/lowl11/boost2/pkg/config"
 	"strings"
+
+	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/stdlib"
+	"github.com/lowl11/boost2/pkg/config"
 )
 
 func buildConnectionString() string {
@@ -21,5 +24,6 @@ func buildConnectionString() string {
 		host, port, username, password, databaseName, schema,
 	)
 
-	return cs.String()
+	pgxCS, _ := pgx.ParseConfig(cs.String())
+	return stdlib.RegisterConnConfig(pgxCS)
 }
