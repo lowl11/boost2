@@ -6,11 +6,7 @@ import (
 
 type Configurator struct {
 	config *sarama.Config
-
-	hosts        []string
-	isBatch      bool
-	batchSize    int
-	alwaysCommit bool
+	hosts  []string
 }
 
 func New(hosts ...string) *Configurator {

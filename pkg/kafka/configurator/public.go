@@ -6,35 +6,17 @@ import (
 	"time"
 )
 
+func (configurator *Configurator) Copy() *Configurator {
+	c := *configurator
+	return &c
+}
+
 func (configurator *Configurator) Config() *sarama.Config {
 	if configurator.config.Net.SASL.Mechanism == "" {
 		configurator.config.Net.SASL.Mechanism = mechanisms.Plain
 	}
 
 	return configurator.config
-}
-
-func (configurator *Configurator) SetAlwaysCommit() *Configurator {
-	configurator.alwaysCommit = true
-	return configurator
-}
-
-func (configurator *Configurator) IsAlwaysCommit() bool {
-	return configurator.alwaysCommit
-}
-
-func (configurator *Configurator) IsBatch() bool {
-	return configurator.isBatch
-}
-
-func (configurator *Configurator) BatchSize() int {
-	return configurator.batchSize
-}
-
-func (configurator *Configurator) SetBatch(size int) *Configurator {
-	configurator.isBatch = true
-	configurator.batchSize = size
-	return configurator
 }
 
 func (configurator *Configurator) SetConsumer(offset int64) *Configurator {
@@ -98,7 +80,12 @@ func (configurator *Configurator) SetMechanism(mechanism string) *Configurator {
 
 func (configurator *Configurator) SetAuth(username, password string) *Configurator {
 	configurator.config.Net.SASL.Enable = true
+	configurator.config.Net.SASL.Handshake = true
 	configurator.config.Net.SASL.User = username
 	configurator.config.Net.SASL.Password = password
 	return configurator
+}
+
+func (configurator *Configurator) SetCustom(apply func(config *sarama.Config)) {
+	apply(configurator.config)
 }
