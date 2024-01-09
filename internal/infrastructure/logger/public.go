@@ -49,13 +49,9 @@ func (logger *Logger) Errorf(template string, args ...any) {
 }
 
 func (logger *Logger) Fatal(args ...any) {
-	logger.printLog(func() {
-		logger.sugar.Fatal(args...)
-	})
+	logger.sugar.Fatal(args...)
 }
 
 func (logger *Logger) Fatalf(template string, args ...any) {
-	logger.printLog(func() {
-		logger.sugar.Fatalf(template, args...)
-	})
+	logger.sugar.Fatalf(template, args...)
 }
