@@ -12,19 +12,19 @@ type ConsumerGroup struct {
 	topicName    string
 	groupName    string
 	client       sarama.ConsumerGroup
-	stopper      chan bool
+	stopper      chan struct{}
 	errorHandler types.ErrorHandler
-	alwaysCommit bool
 }
 
 func New(topicName, groupName string, config *configurator.Configurator) *ConsumerGroup {
 	consumerGroup := &ConsumerGroup{
-		config:       config,
-		topicName:    topicName,
-		groupName:    groupName,
-		stopper:      make(chan bool),
-		alwaysCommit: config.IsAlwaysCommit(),
+		config:    config,
+		topicName: topicName,
+		groupName: groupName,
+		stopper:   make(chan struct{}),
 	}
-	stopper.Get().Add(consumerGroup.Stop)
+	stopper.Get().Add(func() {
+		consumerGroup.stopper <- struct{}{}
+	})
 	return consumerGroup
 }

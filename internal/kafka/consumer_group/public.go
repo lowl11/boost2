@@ -9,10 +9,6 @@ import (
 	"github.com/lowl11/boost2/log"
 )
 
-func (consumerGroup *ConsumerGroup) Stop() {
-	consumerGroup.stopper <- true
-}
-
 func (consumerGroup *ConsumerGroup) SetErrorHandler(errorHandler types.ErrorHandler) interfaces.IConsumer {
 	consumerGroup.errorHandler = errorHandler
 	return consumerGroup

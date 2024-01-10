@@ -2,19 +2,13 @@ package consumer_group
 
 import (
 	"context"
-	"github.com/lowl11/boost2/data/types"
-	"github.com/lowl11/boost2/internal/kafka/consumer_group/handler"
+	"github.com/IBM/sarama"
 	"github.com/lowl11/boost2/log"
 )
 
-func (consumerGroup *ConsumerGroup) handleConsumers(ctx context.Context, handlerFunc types.KafkaConsumerHandler) error {
-	h := handler.New(handlerFunc, consumerGroup.errorHandler, consumerGroup.stopper)
-	if consumerGroup.alwaysCommit {
-		h.SetAlwaysCommit()
-	}
-
+func (consumerGroup *ConsumerGroup) handleConsumers(ctx context.Context, handler sarama.ConsumerGroupHandler) error {
 	go func() {
-		if err := consumerGroup.client.Consume(ctx, []string{consumerGroup.topicName}, h); err != nil {
+		if err := consumerGroup.client.Consume(ctx, []string{consumerGroup.topicName}, handler); err != nil {
 			log.Fatal("Start consuming error: ", err)
 		}
 	}()
@@ -25,6 +19,8 @@ func (consumerGroup *ConsumerGroup) handleConsumers(ctx context.Context, handler
 			if err != nil {
 				return err
 			}
+		case <-consumerGroup.stopper:
+			return nil
 		case <-ctx.Done():
 			return nil
 		}
