@@ -18,3 +18,10 @@ func SetIsolationLevel(isolationLevel sql.IsolationLevel) {
 func IsolationLevel() sql.IsolationLevel {
 	return sql.IsolationLevel(_isolationLevel.Load())
 }
+
+func TxOptions() *sql.TxOptions {
+	return &sql.TxOptions{
+		Isolation: IsolationLevel(),
+		ReadOnly:  false,
+	}
+}
