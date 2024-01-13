@@ -3,7 +3,6 @@ package consumer
 import (
 	"context"
 	"github.com/IBM/sarama"
-	"github.com/lowl11/boost2/data/interfaces"
 	"github.com/lowl11/boost2/data/types"
 	"github.com/lowl11/boost2/internal/infrastructure/destroyer"
 	"github.com/lowl11/boost2/log"
@@ -15,7 +14,7 @@ func (consumer *Consumer) Stop() {
 	}
 }
 
-func (consumer *Consumer) SetErrorHandler(errorHandler types.ErrorHandler) interfaces.IConsumer {
+func (consumer *Consumer) SetErrorHandler(errorHandler types.ErrorHandler) *Consumer {
 	consumer.errorHandler = errorHandler
 	return consumer
 }
