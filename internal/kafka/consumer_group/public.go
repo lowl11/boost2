@@ -3,18 +3,17 @@ package consumer_group
 import (
 	"context"
 	"github.com/IBM/sarama"
-	"github.com/lowl11/boost2/data/interfaces"
 	"github.com/lowl11/boost2/data/types"
 	"github.com/lowl11/boost2/internal/infrastructure/destroyer"
 	"github.com/lowl11/boost2/log"
 )
 
-func (consumerGroup *ConsumerGroup) SetErrorHandler(errorHandler types.ErrorHandler) interfaces.IConsumer {
+func (consumerGroup *ConsumerGroup) SetErrorHandler(errorHandler types.ErrorHandler) *ConsumerGroup {
 	consumerGroup.errorHandler = errorHandler
 	return consumerGroup
 }
 
-func (consumerGroup *ConsumerGroup) StartConsume(ctx context.Context, handlerFunc types.KafkaConsumerHandler) error {
+func (consumerGroup *ConsumerGroup) StartConsume(ctx context.Context, handler sarama.ConsumerGroupHandler) error {
 	client, err := sarama.NewConsumerGroup(
 		consumerGroup.config.Hosts(),
 		consumerGroup.groupName,
@@ -32,12 +31,12 @@ func (consumerGroup *ConsumerGroup) StartConsume(ctx context.Context, handlerFun
 		}
 	})
 
-	return consumerGroup.handleConsumers(ctx, handlerFunc)
+	return consumerGroup.handleConsumers(ctx, handler)
 }
 
-func (consumerGroup *ConsumerGroup) StartConsumeAsync(ctx context.Context, handlerFunc types.KafkaConsumerHandler) {
+func (consumerGroup *ConsumerGroup) StartConsumeAsync(ctx context.Context, handler sarama.ConsumerGroupHandler) {
 	go func() {
-		if err := consumerGroup.StartConsume(ctx, handlerFunc); err != nil {
+		if err := consumerGroup.StartConsume(ctx, handler); err != nil {
 			log.Fatal("Start consume error: ", err)
 		}
 	}()

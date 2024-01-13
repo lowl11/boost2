@@ -2,14 +2,8 @@ package boost2
 
 import (
 	"context"
-	"github.com/lowl11/boost2/data/interfaces"
 	"github.com/lowl11/boost2/internal/infrastructure/stopper"
 	"github.com/lowl11/boost2/log"
-)
-
-type (
-	IConsumer = interfaces.IConsumer
-	IProducer = interfaces.IProducer
 )
 
 type Config struct {
