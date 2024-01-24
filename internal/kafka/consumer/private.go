@@ -1,13 +1,14 @@
 package consumer
 
 import (
+	"context"
 	"github.com/IBM/sarama"
 	"github.com/lowl11/boost2/data/types"
 	"github.com/lowl11/boost2/log"
 	"sync"
 )
 
-func (consumer *Consumer) handleConsumers(partitions []int32, handlerFunc types.KafkaConsumerHandler) {
+func (consumer *Consumer) handleConsumers(ctx context.Context, partitions []int32, handlerFunc types.KafkaConsumerHandler) {
 	goroutines := make([]*sync.WaitGroup, len(partitions))
 	consumer.stoppers = make([]chan bool, 0, len(partitions))
 
@@ -18,11 +19,11 @@ func (consumer *Consumer) handleConsumers(partitions []int32, handlerFunc types.
 	}
 
 	for i := 0; i < len(goroutines); i++ {
-		go consumer.handleConsumerFunc(goroutines[i], int32(i), handlerFunc)
+		go consumer.handleConsumerFunc(ctx, goroutines[i], int32(i), handlerFunc)
 	}
 }
 
-func (consumer *Consumer) handleConsumerFunc(wg *sync.WaitGroup, partitionNum int32, handlerFunc types.KafkaConsumerHandler) {
+func (consumer *Consumer) handleConsumerFunc(ctx context.Context, wg *sync.WaitGroup, partitionNum int32, handlerFunc types.KafkaConsumerHandler) {
 	defer wg.Done()
 
 	partConsumer, err := consumer.client.ConsumePartition(consumer.topicName, partitionNum, sarama.OffsetNewest)
@@ -37,10 +38,13 @@ func (consumer *Consumer) handleConsumerFunc(wg *sync.WaitGroup, partitionNum in
 		case kafkaError := <-partConsumer.Errors():
 			log.Error("Kafka consumer error: ", kafkaError.Error(), ". Partition: ", kafkaError.Partition)
 		case <-consumer.stoppers[partitionNum]:
-			log.Info("Stopping consumer with partition #", partitionNum+1)
+			log.Info("Stopping consumer by stopper with partition #", partitionNum+1)
 			if err = partConsumer.Close(); err != nil {
 				log.Error("Close partition consumer error: ", err)
 			}
+			return
+		case <-ctx.Done():
+			log.Info("Stopping consumer by context with partition #", partitionNum+1)
 			return
 		}
 	}

@@ -40,7 +40,7 @@ func (consumer *Consumer) StartConsume(ctx context.Context, handlerFunc types.Ka
 
 	log.Debugf("Consume %d partitions", len(partitions))
 
-	consumer.handleConsumers(partitions, handlerFunc)
+	consumer.handleConsumers(ctx, partitions, handlerFunc)
 
 	return nil
 }
