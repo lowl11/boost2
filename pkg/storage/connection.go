@@ -8,7 +8,7 @@ import (
 
 func ConnectPool(builder *ConnectionBuilder) (*sqlx.DB, error) {
 	// open connection pool
-	connection, err := sqlx.Open("pgx", buildConnectionString())
+	connection, err := sqlx.Open("pgx", buildConnectionString(builder.ignoreSchema))
 	if err != nil {
 		return nil, err
 	}

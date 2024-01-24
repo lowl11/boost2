@@ -8,6 +8,8 @@ type ConnectionBuilder struct {
 
 	maxConnectionLifetime *time.Duration
 	maxIdleLifetime       *time.Duration
+
+	ignoreSchema bool
 }
 
 func NewConnectionBuilder() *ConnectionBuilder {
@@ -40,6 +42,15 @@ func (builder *ConnectionBuilder) getMaxConnectionLifetime() time.Duration {
 func (builder *ConnectionBuilder) SetMaxIdleLifetime(lifetime time.Duration) *ConnectionBuilder {
 	builder.maxIdleLifetime = &lifetime
 	return builder
+}
+
+func (builder *ConnectionBuilder) IgnoreSchema() *ConnectionBuilder {
+	builder.ignoreSchema = true
+	return builder
+}
+
+func (builder *ConnectionBuilder) isIgnoreSchema() bool {
+	return builder.ignoreSchema
 }
 
 func (builder *ConnectionBuilder) getMaxIdleLifetime() time.Duration {
