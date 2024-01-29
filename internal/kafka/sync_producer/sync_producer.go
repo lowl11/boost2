@@ -18,8 +18,6 @@ func New(config *configurator.Configurator) (*Producer, error) {
 	}
 
 	return &Producer{
-		client:    client,
-		isBatch:   config.IsBatch(),
-		batchSize: config.BatchSize(),
+		client: client,
 	}, nil
 }
