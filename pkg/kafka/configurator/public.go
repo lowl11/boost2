@@ -23,6 +23,7 @@ func (configurator *Configurator) SetConsumer(offset int64) *Configurator {
 	configurator.config.Consumer.Return.Errors = true
 	configurator.config.Consumer.Offsets.Initial = offset
 	configurator.config.Consumer.Offsets.AutoCommit.Enable = false
+	configurator.offset = offset
 	return configurator
 }
 

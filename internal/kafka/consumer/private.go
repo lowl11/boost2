@@ -26,7 +26,7 @@ func (consumer *Consumer) handleConsumers(ctx context.Context, partitions []int3
 func (consumer *Consumer) handleConsumerFunc(ctx context.Context, wg *sync.WaitGroup, partitionNum int32, handlerFunc types.KafkaConsumerHandler) {
 	defer wg.Done()
 
-	partConsumer, err := consumer.client.ConsumePartition(consumer.topicName, partitionNum, sarama.OffsetNewest)
+	partConsumer, err := consumer.client.ConsumePartition(consumer.topicName, partitionNum, consumer.config.Config().Consumer.Offsets.Initial)
 	if err != nil {
 		log.Error("Consuming partition error: ", err)
 	}

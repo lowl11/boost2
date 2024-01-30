@@ -7,6 +7,7 @@ import (
 type Configurator struct {
 	config *sarama.Config
 	hosts  []string
+	offset int64
 }
 
 func New(hosts ...string) *Configurator {
