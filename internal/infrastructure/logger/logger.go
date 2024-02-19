@@ -1,7 +1,11 @@
 package logger
 
 import (
+	"os"
+
 	"github.com/lowl11/boost2/internal/infrastructure/stopper"
+	"github.com/lowl11/boost2/internal/kafka/sync_producer"
+	"github.com/lowl11/boost2/pkg/kafka/configurator"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -12,6 +16,60 @@ type Logger struct {
 }
 
 var instance *Logger
+
+type Config struct {
+	SendToKafka bool
+
+	Cfg      *configurator.Configurator
+	LogTopic string
+	LogLevel zapcore.Level
+}
+
+func InitBroker(cfg Config) error {
+	producer, err := sync_producer.New(cfg.Cfg)
+	if err != nil {
+		return err
+	}
+	// Create Zap encoder
+	encoderCfg := zapcore.EncoderConfig{
+		TimeKey:        "time",
+		LevelKey:       "level",
+		NameKey:        "logger",
+		CallerKey:      "caller",
+		MessageKey:     "message",
+		StacktraceKey:  "stacktrace",
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.LowercaseLevelEncoder,
+		EncodeTime:     zapcore.EpochTimeEncoder,
+		EncodeDuration: zapcore.SecondsDurationEncoder,
+		EncodeCaller:   zapcore.ShortCallerEncoder,
+	}
+	encoder := zapcore.NewJSONEncoder(encoderCfg)
+
+	// Create Zap core
+	core := zapcore.NewCore(encoder, zapcore.AddSync(os.Stdout), cfg.LogLevel)
+
+	if cfg.SendToKafka {
+		kafkaSink := NewKafkaSink(producer, cfg.LogTopic)
+		// Send logs to Kafka by adding KafkaSink to the core
+		core = zapcore.NewTee(core, zapcore.NewCore(encoder, zapcore.AddSync(kafkaSink), cfg.LogLevel))
+	}
+
+	logger := zap.New(core)
+
+	zap.ReplaceGlobals(logger)
+	stopper.Get().Add(func() {
+		_ = logger.Sync()
+	})
+
+	instance = &Logger{
+		sugar:      logger.Sugar(),
+		logChannel: make(chan func()),
+	}
+	instance.listen()
+
+	return nil
+}
 
 func Get() *Logger {
 	if instance != nil {
