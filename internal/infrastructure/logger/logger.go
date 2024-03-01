@@ -25,11 +25,7 @@ type Config struct {
 	LogLevel zapcore.Level
 }
 
-func InitBroker(cfg Config) error {
-	producer, err := sync_producer.New(cfg.Cfg)
-	if err != nil {
-		return err
-	}
+func Configured(cfg Config) error {
 	// Create Zap encoder
 	encoderCfg := zapcore.EncoderConfig{
 		TimeKey:        "time",
@@ -50,6 +46,11 @@ func InitBroker(cfg Config) error {
 	core := zapcore.NewCore(encoder, zapcore.AddSync(os.Stdout), cfg.LogLevel)
 
 	if cfg.SendToKafka {
+		producer, err := sync_producer.New(cfg.Cfg)
+		if err != nil {
+			return err
+		}
+
 		kafkaSink := NewKafkaSink(producer, cfg.LogTopic)
 		// Send logs to Kafka by adding KafkaSink to the core
 		core = zapcore.NewTee(core, zapcore.NewCore(encoder, zapcore.AddSync(kafkaSink), cfg.LogLevel))
