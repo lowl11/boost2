@@ -23,6 +23,8 @@ type Config struct {
 	Cfg      *configurator.Configurator
 	LogTopic string
 	LogLevel zapcore.Level
+
+	ServiceName string
 }
 
 func InitLogger(cfg *Config) error {
@@ -31,6 +33,7 @@ func InitLogger(cfg *Config) error {
 		Cfg:         cfg.Cfg,
 		LogTopic:    cfg.LogTopic,
 		LogLevel:    cfg.LogLevel,
+		ServiceName: cfg.ServiceName,
 	})
 }
 
