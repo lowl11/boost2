@@ -23,6 +23,8 @@ type Config struct {
 	Cfg      *configurator.Configurator
 	LogTopic string
 	LogLevel zapcore.Level
+
+	ServiceName string
 }
 
 func Configured(cfg Config) error {
@@ -40,6 +42,7 @@ func Configured(cfg Config) error {
 		EncodeDuration: zapcore.SecondsDurationEncoder,
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
+
 	encoder := zapcore.NewJSONEncoder(encoderCfg)
 
 	// Create Zap core
@@ -51,7 +54,7 @@ func Configured(cfg Config) error {
 			return err
 		}
 
-		kafkaSink := NewKafkaSink(producer, cfg.LogTopic)
+		kafkaSink := NewKafkaSink(producer, cfg.LogTopic, cfg.ServiceName)
 		// Send logs to Kafka by adding KafkaSink to the core
 		core = zapcore.NewTee(core, zapcore.NewCore(encoder, zapcore.AddSync(kafkaSink), cfg.LogLevel))
 	}
