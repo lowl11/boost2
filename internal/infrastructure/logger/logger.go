@@ -46,7 +46,7 @@ func Configured(cfg Config) error {
 	encoder := zapcore.NewJSONEncoder(encoderCfg)
 
 	// Create Zap core
-	core := zapcore.NewCore(encoder, zapcore.AddSync(os.Stdout), cfg.LogLevel)
+	core := zapcore.NewCore(encoder, zapcore.AddSync(os.Stdout), zapcore.DebugLevel)
 
 	if cfg.SendToKafka {
 		producer, err := sync_producer.New(cfg.Cfg)
