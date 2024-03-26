@@ -3,8 +3,8 @@ package logger
 import (
 	"os"
 
+	"github.com/IBM/sarama"
 	"github.com/lowl11/boost2/internal/infrastructure/stopper"
-	"github.com/lowl11/boost2/internal/kafka/sync_producer"
 	"github.com/lowl11/boost2/pkg/kafka/configurator"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -30,11 +30,11 @@ type Config struct {
 func Configured(cfg Config) error {
 	// Create Zap encoder
 	encoderCfg := zapcore.EncoderConfig{
-		TimeKey:        "time",
+		MessageKey:     "message",
 		LevelKey:       "level",
+		TimeKey:        "time",
 		NameKey:        "logger",
 		CallerKey:      "caller",
-		MessageKey:     "message",
 		StacktraceKey:  "stacktrace",
 		LineEnding:     zapcore.DefaultLineEnding,
 		EncodeLevel:    zapcore.LowercaseLevelEncoder,
@@ -49,7 +49,7 @@ func Configured(cfg Config) error {
 	core := zapcore.NewCore(encoder, zapcore.AddSync(os.Stdout), zapcore.DebugLevel)
 
 	if cfg.SendToKafka {
-		producer, err := sync_producer.New(cfg.Cfg)
+		producer, err := sarama.NewSyncProducer(cfg.Cfg.Hosts(), cfg.Cfg.Config())
 		if err != nil {
 			return err
 		}

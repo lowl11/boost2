@@ -3,7 +3,7 @@ package logger
 import (
 	"time"
 
-	"github.com/lowl11/boost2/internal/kafka/sync_producer"
+	"github.com/IBM/sarama"
 	"github.com/lowl11/boost2/pkg/stopper"
 )
 
@@ -30,13 +30,13 @@ func (logger *Logger) printLog(logFunc func()) {
 
 // KafkaSink implements zapcore.WriteSyncer to send logs to a Kafka topic
 type KafkaSink struct {
-	producer    *sync_producer.Producer
+	producer    sarama.SyncProducer
 	topic       string
 	serviceName string
 }
 
 // NewKafkaSink creates a new KafkaSink
-func NewKafkaSink(producer *sync_producer.Producer, topic, serviceName string) *KafkaSink {
+func NewKafkaSink(producer sarama.SyncProducer, topic, serviceName string) *KafkaSink {
 	return &KafkaSink{
 		serviceName: serviceName,
 		producer:    producer,
@@ -46,11 +46,15 @@ func NewKafkaSink(producer *sync_producer.Producer, topic, serviceName string) *
 
 // Write serializes the log entry and sends it to Kafka
 func (k *KafkaSink) Write(p []byte) (n int, err error) {
-	mess := LogMessage{
-		Service: k.serviceName,
-		Data:    string(p),
-	}
-	err = k.producer.Publish(k.topic, "", mess)
+	_, _, err = k.producer.SendMessage(&sarama.ProducerMessage{
+		Topic: k.topic,
+		Key:   sarama.ByteEncoder(k.serviceName),
+		Value: sarama.ByteEncoder(p),
+		Headers: []sarama.RecordHeader{{
+			Key:   []byte("service"),
+			Value: []byte(k.serviceName),
+		}},
+	})
 	if err != nil {
 		return 0, err
 	}
